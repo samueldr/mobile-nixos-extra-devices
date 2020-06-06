@@ -50,3 +50,22 @@ options. Mostly those options will define missing quirks or hardware.
 
 This is the main magic that is happening to automatically merge the added
 options to the main Mobile NixOS repository. No magic, only imports.
+
+
+Non-Goals
+---------
+
+This repository will **not** be a staging grounds for WIP ports. It is
+exclusively used for experimenting.
+
+Which means that if you have devices to contribute to this repository, think
+carefully, it's probably meant for upstream if your device is a phone or a
+tablet. If it isn't, fork this repo, remove what you don't need and make your
+own extra devices!
+
+Though, this does not mean I don't want contributions. If you have worthwhile
+contributions to these devices, or to the experiments, feel free to contribute.
+
+Note that it is possible that this repository drifts and becomes incompatible
+with Mobile NixOS. If it does, it is a bug, it should be fixed, but there is
+no SLA. It might stay broken forever.
