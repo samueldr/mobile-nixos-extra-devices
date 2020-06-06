@@ -1,2 +1,3 @@
 { imports = [
+  ./hardware-rockchip.nix
 ]; }
