@@ -1,0 +1,32 @@
+From 1be261edf2193636bbace7f5b691982f921db51e Mon Sep 17 00:00:00 2001
+From: Samuel Dionne-Riel <samuel@dionne-riel.com>
+Date: Sat, 6 Jun 2020 04:32:08 -0400
+Subject: [PATCH] ASoC: cs42xx8: Fix building built-in
+
+1eae3b542eb27f7a0c62e62fb158b26243740e77 broke built-in build as
+cs42xx8_of_match ends up being defined twice.
+---
+ sound/soc/codecs/cs42xx8.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sound/soc/codecs/cs42xx8.c b/sound/soc/codecs/cs42xx8.c
+index 203e3f368bd5..c189a68027ba 100644
+--- a/sound/soc/codecs/cs42xx8.c
++++ b/sound/soc/codecs/cs42xx8.c
+@@ -511,12 +511,12 @@ const struct cs42xx8_driver_data cs42888_data = {
+ };
+ EXPORT_SYMBOL_GPL(cs42888_data);
+ 
++#if !IS_ENABLED(CONFIG_SND_SOC_CS42XX8_I2C)
+ const struct of_device_id cs42xx8_of_match[] = {
+ 	{ .compatible = "cirrus,cs42448", .data = &cs42448_data, },
+ 	{ .compatible = "cirrus,cs42888", .data = &cs42888_data, },
+ 	{ /* sentinel */ }
+ };
+-#if !IS_ENABLED(CONFIG_SND_SOC_CS42XX8_I2C)
+ MODULE_DEVICE_TABLE(of, cs42xx8_of_match);
+ EXPORT_SYMBOL_GPL(cs42xx8_of_match);
+ #endif
+-- 
+2.25.3
+
