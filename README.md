@@ -30,12 +30,12 @@ of the usual Mobile NixOS.
 
 ```
 .../Projects/extra-devices $ nix-build \
-    --arg device ./devices/device-name \
+    --arg device .../extra-devices/device-name \
     ../mobile-nixos/examples/hello/ \
     -A build.default
-trace: *******************************************************************
-trace: * Evaluating device from path: .../extra-devices/devices/poopidoo *
-trace: *******************************************************************
+trace: **************************************************************
+trace: * Evaluating device from path: .../extra-devices/device-name *
+trace: **************************************************************
 ...
 ```
 
