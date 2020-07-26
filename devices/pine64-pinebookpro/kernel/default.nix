@@ -6,16 +6,17 @@
 }:
 
 (mobile-nixos.kernel-builder {
-  version = "5.5.0-rc7";
+  version = "5.8.0-rc1";
   configfile = ./config.aarch64;
   src = fetchFromGitLab {
     domain = "gitlab.manjaro.org";
     owner = "tsys";
     repo = "linux-pinebook-pro";
-    rev = "b3ba5b2b87e9bd191265776b93277e49d044b79e";
-    sha256 = "1fj6gkpy422lw23qg0hwyv5hbfx3pfhgv67ma44ly2mxmgna4nsh";
+    rev = "57cc0e9636c160cbae5845cedf0d463e87a6023c";
+    sha256 = "1j7xlclm4zmgsp5dkgzrhhjmkrg7xvqlgdz5zlj0g1g7xpxg9cwc";
   };
   patches = [
+    ./0001-HACK-Revert-pwm-Read-initial-hardware-state-at-reque.patch
   ];
 }).overrideAttrs({ postInstall ? "", postPatch ? "", ... }: {
   installTargets = [ "install" "dtbs" ];
