@@ -42,6 +42,13 @@ trace: **************************************************************
 The second usage is more likely to be the one you end up using.
 
 
+### Alternative usage
+
+Users may want to symlink the device folders into their Mobile NixOS checkout.
+The main benefit is that they now act just like built-in devices, including
+working `bin/kernel-normalize-config`.
+
+
 Implementation details
 ----------------------
 
