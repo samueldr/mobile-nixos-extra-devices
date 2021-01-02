@@ -19,6 +19,7 @@ mobile-nixos.kernel-builder {
 
   patches = [
     ./0001-HACK-Bake-in-touchscreen-tranformation-matrix.patch
+    ./0001-rtl8723bs-Allow-building-into-the-kernel.patch
   ];
 
   # The author keeps their config in the tree :/
