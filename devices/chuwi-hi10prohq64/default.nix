@@ -7,8 +7,11 @@ let
   '';
 in
 {
-  # Import experimental modules
-  imports = [ ../../modules/modules-list.nix ];
+  imports = [
+    ./rtl8723bs
+    # Import experimental modules
+    ../../modules/modules-list.nix
+  ];
 
   mobile.device.name = "chuwi-hi10prohq64";
   mobile.device.identity = {
