@@ -18,6 +18,7 @@ mobile-nixos.kernel-builder {
   };
 
   patches = [
+    ./0001-HACK-Bake-in-touchscreen-tranformation-matrix.patch
   ];
 
   # The author keeps their config in the tree :/
