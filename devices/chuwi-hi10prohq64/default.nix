@@ -39,6 +39,20 @@ in
 
   mobile.system.type = "uefi";
 
+  # The controller is hidden from the OS unless started using the "android"
+  # launch option in the weird UEFI GUI chooser.
+  mobile.usb.mode = "gadgetfs";
+
+  # It seems CHUWI does not have an idVendor...
+  mobile.usb.idVendor = "1209";  # http://pid.codes/1209/
+  mobile.usb.idProduct = "0069"; # "common tasks, such as testing, generic USB-CDC devices, etc."
+
+  # Mainline gadgetfs functions
+  mobile.usb.gadgetfs.functions = {
+    rndis = "rndis.usb0";
+    mass_storage = "mass_storage.0";
+  };
+
   mobile.device.firmware = pkgs.callPackage ./firmware {};
   mobile.boot.stage-1.firmware = [
     config.mobile.device.firmware
