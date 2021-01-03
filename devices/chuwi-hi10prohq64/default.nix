@@ -58,4 +58,9 @@ in
 
   # For the booted system
   services.udev.extraRules = extraUdevRules;
+
+  # Don't use the framebuffer driver for X11
+  services.xserver = {
+    videoDrivers = lib.mkForce [ "modesetting" ];
+  };
 }
