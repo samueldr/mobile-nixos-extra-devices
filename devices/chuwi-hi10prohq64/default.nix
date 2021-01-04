@@ -8,6 +8,7 @@ let
 in
 {
   imports = [
+    ./android.nix
     ./rtl8723bs
     # Import experimental modules
     ../../modules/modules-list.nix
