@@ -20,11 +20,13 @@ in
     manufacturer = "CHUWI";
   };
 
-  boot.kernelParams = [
+  boot.consoleLogLevel = lib.mkDefault 0;
+
+  boot.kernelParams = lib.mkOrder 99999 [
     "drm.vblankoffdelay=1" # Suggested from android
-    "quiet"
     "vt.global_cursor_default=0"
     "console=tty2"
+    "loglevel=0"
   ];
 
   mobile.boot.stage-1 = {
