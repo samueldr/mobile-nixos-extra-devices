@@ -54,6 +54,11 @@ in
     mass_storage = "mass_storage.0";
   };
 
+  mobile.boot.stage-1.bootConfig = {
+    # Used by jumpdrive to share the internal drive
+    storage.internal = "/dev/disk/by-path/platform-80860F14:00";
+  };
+
   mobile.device.firmware = pkgs.callPackage ./firmware {};
   mobile.boot.stage-1.firmware = [
     config.mobile.device.firmware
