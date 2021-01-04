@@ -21,6 +21,7 @@ in
   };
 
   boot.kernelParams = [
+    "drm.vblankoffdelay=1" # Suggested from android
     "quiet"
     "vt.global_cursor_default=0"
     "console=tty2"
