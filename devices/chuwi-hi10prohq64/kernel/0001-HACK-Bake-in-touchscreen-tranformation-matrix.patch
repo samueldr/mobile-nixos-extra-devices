@@ -1,0 +1,46 @@
+From 27287920ca0a589e16370eb3f0cd764e9e3674c5 Mon Sep 17 00:00:00 2001
+From: Samuel Dionne-Riel <samuel@dionne-riel.com>
+Date: Sat, 2 Jan 2021 05:20:06 -0500
+Subject: [PATCH] HACK: Bake-in touchscreen tranformation matrix
+
+This might apply to all HQ64 Chuwi Hi10 pro?
+
+Though I assume it won't to anything else!
+
+This patch is extremely cursed^W specific to me.
+---
+ drivers/input/touchscreen/silead.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/input/touchscreen/silead.c b/drivers/input/touchscreen/silead.c
+index 8fa2f3b7cfd8b..eb7e2a11a6ae9 100644
+--- a/drivers/input/touchscreen/silead.c
++++ b/drivers/input/touchscreen/silead.c
+@@ -174,9 +174,22 @@ static void silead_ts_read_data(struct i2c_client *client)
+ 		 */
+ 		data->id[touch_nr] = (bufp[SILEAD_POINT_X_MSB_OFF] &
+ 				      SILEAD_EXTRA_DATA_MASK) >> 4;
++
++		// HACK! we are:
++		//   - swapping the axes (rotation)
++		//   - scaling the axes
++		// (no floating point here)
++		//
++		// Approximation of this matrix:
++		//
++		//     0.00  3.23 -0.01
++		//     2.15  0.00 -0.04
++		//     0.00  0.00  1.00
++		//
+ 		touchscreen_set_mt_pos(&data->pos[touch_nr], &data->prop,
+-			get_unaligned_le16(&bufp[SILEAD_POINT_X_OFF]) & 0xfff,
+-			get_unaligned_le16(&bufp[SILEAD_POINT_Y_OFF]) & 0xfff);
++			(get_unaligned_le16(&bufp[SILEAD_POINT_Y_OFF]) & 0xfff) * 323 / 100 + ( 0x1000 * -1 / 100 ) ,
++			(get_unaligned_le16(&bufp[SILEAD_POINT_X_OFF]) & 0xfff) * 215 / 100 + ( 0x1000 * -4 / 100 )
++		);
+ 		touch_nr++;
+ 	}
+ 
+-- 
+2.29.2
+

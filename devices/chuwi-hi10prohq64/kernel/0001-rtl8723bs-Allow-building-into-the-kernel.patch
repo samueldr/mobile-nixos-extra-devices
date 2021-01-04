@@ -1,0 +1,24 @@
+From 64ee4f785639b9c4cabb8735a746d0fa062cd24b Mon Sep 17 00:00:00 2001
+From: Samuel Dionne-Riel <samuel@dionne-riel.com>
+Date: Sat, 2 Jan 2021 17:56:19 -0500
+Subject: [PATCH] rtl8723bs: Allow building into the kernel
+
+---
+ drivers/staging/rtl8723bs/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/staging/rtl8723bs/Kconfig b/drivers/staging/rtl8723bs/Kconfig
+index a88467334dacc..c75c005488946 100644
+--- a/drivers/staging/rtl8723bs/Kconfig
++++ b/drivers/staging/rtl8723bs/Kconfig
+@@ -2,7 +2,6 @@
+ config RTL8723BS
+ 	tristate "Realtek RTL8723BS SDIO Wireless LAN NIC driver"
+ 	depends on WLAN && MMC && CFG80211
+-	depends on m
+ 	select WIRELESS_EXT
+ 	select WEXT_PRIV
+ 	help
+-- 
+2.29.2
+
