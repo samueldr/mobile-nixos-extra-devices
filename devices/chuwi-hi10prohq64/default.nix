@@ -77,4 +77,6 @@ in
   services.xserver = {
     videoDrivers = lib.mkForce [ "modesetting" ];
   };
+
+  mobile.quirks.intel.intel_xhci_usb_sw-role-switch.enable = true;
 }
