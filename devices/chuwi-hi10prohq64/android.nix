@@ -5,11 +5,11 @@
 # Using kernelflinger from the vendor, this allows booting using
 # the android boot flow, but more importantly, using `fastboot boot`.
 
-{ lib, baseModules, modules, ... }:
+{ lib, baseModules, modules, _mobile-nixos, ... }:
 
 let
-  # FIXME: Do not rely on NIX_PATH here
-  android = (import <mobile-nixos/lib/eval-config.nix> {
+  inherit (_mobile-nixos) evalConfig;
+  android = evalConfig {
     inherit baseModules;
     modules = modules ++ [{
       mobile.system.android = {
@@ -26,7 +26,7 @@ let
       };
       mobile.system.type = lib.mkForce "android";
     }];
-  });
+  };
 in
 {
   system.build.android-bootimg = android.config.system.build.android-bootimg;
