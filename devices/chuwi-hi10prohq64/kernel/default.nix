@@ -1,21 +1,17 @@
 {
   mobile-nixos
-, fetchFromGitHub
-, fetchpatch
-, kernelPatches ? [] # FIXME
+, fetchurl
 }:
 
 # FIXME use the known good revision
-mobile-nixos.kernel-builder {
-  version = "5.10.0-rc6";
+mobile-nixos.kernel-builder rec {
+  version = "5.10.4";
   configfile = ./config.x86_64;
 
-  src = fetchFromGitHub {
-    owner = "jwrdegoede";
-    repo = "linux-sunxi";
-    rev = "b6fc1d687f8ca99c45deb8a8d9d8097cc96dd91e";
-    sha256 = "0fr9y4al7xg4wfan0v1r3a7fp17cbll2vabi36bcjal2k78xrrq3";
-  };
+  src = fetchurl {
+    url = "mirror://kernel/linux/kernel/v5.x/linux-${version}.tar.xz";
+    sha256 = "1v2nbpp21c3fkw23dgrrfznnnlvi0538kj8wrlb2m6g94rn3jklh";
+  };                                                            
 
   patches = [
     ./0001-HACK-Bake-in-touchscreen-tranformation-matrix.patch
