@@ -11,7 +11,6 @@
 
   boot.kernelParams = [
     # Serial console on ttyS2, using the dedicated cable.
-    "cma=32M"
     "console=ttyS2,1500000n8"
     "earlycon=uart8250,mmio32,0xff1a0000"
     "earlyprintk"
