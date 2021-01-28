@@ -38,4 +38,6 @@
   mobile.boot.stage-1.firmware = [
     config.mobile.device.firmware
   ];
+
+  mobile.boot.stage-1.tasks = [ ./usb_role_switch_task.rb ];
 }
