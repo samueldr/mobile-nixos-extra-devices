@@ -1,0 +1,34 @@
+From 056c6a0af86867f8ec2ce5835bebe25a108d3ae0 Mon Sep 17 00:00:00 2001
+From: Samuel Dionne-Riel <samuel@dionne-riel.com>
+Date: Thu, 28 Jan 2021 15:44:54 -0500
+Subject: [PATCH] arm64: dts: rockchip: set type-c dr_mode as otg
+
+This goes against what 75152d66315521a48c4997305f4e01c5f139e160 did,
+where they set the rockpro64 type-c to host due to reliability issue.
+
+The change is meant to allow using the type-c port for gadget mode.
+
+The role switch, and role switch mode are meant to allow userspace
+control of the mode, using role switch.
+---
+ arch/arm64/boot/dts/rockchip/rk3399-pinebook-pro.dts | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/rockchip/rk3399-pinebook-pro.dts b/arch/arm64/boot/dts/rockchip/rk3399-pinebook-pro.dts
+index d77dca5524ff3..3fd92fe57c08b 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3399-pinebook-pro.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3399-pinebook-pro.dts
+@@ -1139,7 +1139,9 @@ &usbdrd3_0 {
+ };
+ 
+ &usbdrd_dwc3_0 {
+-	dr_mode = "host";
++	dr_mode = "otg";
++	usb-role-switch;
++	role-switch-default-mode = "host";
+ 	status = "okay";
+ };
+ 
+-- 
+2.29.2
+

@@ -17,6 +17,8 @@ mobile-nixos.kernel-builder {
 
   patches = [
     ./0001-HACK-Revert-pwm-Read-initial-hardware-state-at-reque.patch
+    ./0001-arm64-dts-rockchip-set-type-c-dr_mode-as-otg.patch
+    ./0001-usb-dwc3-Enable-userspace-role-switch-control.patch
   ];
 
   postInstall = ''
