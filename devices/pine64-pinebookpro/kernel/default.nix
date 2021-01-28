@@ -4,15 +4,15 @@
 }:
 
 mobile-nixos.kernel-builder {
-  version = "5.8.0-rc1";
+  version = "5.10.0-rc5";
   configfile = ./config.aarch64;
 
   src = fetchFromGitLab {
     domain = "gitlab.manjaro.org";
     owner = "tsys";
     repo = "linux-pinebook-pro";
-    rev = "57cc0e9636c160cbae5845cedf0d463e87a6023c";
-    sha256 = "1j7xlclm4zmgsp5dkgzrhhjmkrg7xvqlgdz5zlj0g1g7xpxg9cwc";
+    rev = "c04087388bdb7d79d5202ffb91aa387e36901056";
+    sha256 = "0igxbq8i0z6qs1kxxxs440d1n1j5p5a26lgcn7q5k82rdjqhwpw9";
   };
 
   patches = [
