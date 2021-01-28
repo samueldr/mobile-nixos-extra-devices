@@ -39,5 +39,25 @@
     config.mobile.device.firmware
   ];
 
+  # The controller is hidden from the OS unless started using the "android"
+  # launch option in the weird UEFI GUI chooser.
+  mobile.usb.mode = "gadgetfs";
+
+  # It seems Pine64 does not have an idVendor...
+  mobile.usb.idVendor = "1209";  # http://pid.codes/1209/
+  mobile.usb.idProduct = "0069"; # "common tasks, such as testing, generic USB-CDC devices, etc."
+
+  # Mainline gadgetfs functions
+  mobile.usb.gadgetfs.functions = {
+    rndis = "rndis.usb0";
+    mass_storage = "mass_storage.0";
+    adb = "ffs.adb";
+  };
+
+  mobile.boot.stage-1.bootConfig = {
+    # Used by target-disk-mode to share the internal drive
+    storage.internal = "/dev/disk/by-path/platform-fe330000.sdhci";
+  };
+
   mobile.boot.stage-1.tasks = [ ./usb_role_switch_task.rb ];
 }
