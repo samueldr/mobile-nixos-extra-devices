@@ -5,13 +5,12 @@
 # Using kernelflinger from the vendor, this allows booting using
 # the android boot flow, but more importantly, using `fastboot boot`.
 
-{ lib, baseModules, modules, _mobile-nixos, ... }:
+{ config, lib, mobile-nixos, ... }:
 
 let
-  inherit (_mobile-nixos) evalConfig;
-  android = evalConfig {
-    inherit baseModules;
-    modules = modules ++ [{
+  inherit (mobile-nixos.lib) composeConfig;
+  android = composeConfig {
+    config = {
       mobile.system.android = {
         boot_as_recovery = false;
         has_recovery_partition = true;
@@ -25,7 +24,7 @@ let
         };
       };
       mobile.system.type = lib.mkForce "android";
-    }];
+    };
   };
 in
 {
