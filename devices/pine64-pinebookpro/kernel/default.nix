@@ -1,6 +1,7 @@
 {
   mobile-nixos
 , fetchFromGitLab
+, ...
 }:
 
 mobile-nixos.kernel-builder {
