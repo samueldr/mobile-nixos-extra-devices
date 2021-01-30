@@ -1,6 +1,7 @@
 {
   mobile-nixos
 , fetchurl
+, ...
 }:
 
 # FIXME use the known good revision
