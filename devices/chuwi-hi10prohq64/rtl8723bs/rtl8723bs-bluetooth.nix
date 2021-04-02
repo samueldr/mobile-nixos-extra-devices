@@ -34,7 +34,7 @@ stdenv.mkDerivation rec {
     patchShebangs $out/lib/start_bt.sh
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Userspace configuration for rtl8723bs bluetooth.";
     license = licenses.unfreeRedistributableFirmware;
     platforms = platforms.linux;
