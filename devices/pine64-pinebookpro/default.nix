@@ -32,7 +32,6 @@
   };
 
   mobile.system.type = "u-boot";
-  mobile.quirks.u-boot.package = pkgs.callPackage ./u-boot {};
 
   mobile.device.firmware = pkgs.callPackage ./firmware {};
   mobile.boot.stage-1.firmware = [
