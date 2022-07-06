@@ -1,7 +1,9 @@
 { config, lib, pkgs, ... }:
 {
   # Import experimental modules
-  imports = [ ../../modules/modules-list.nix ];
+  imports = [
+    ../../modules/modules-list.nix
+  ];
 
   mobile.device.name = "pine64-pinebookpro";
   mobile.device.identity = {
@@ -14,6 +16,7 @@
     "console=ttyS2,1500000n8"
     "earlycon=uart8250,mmio32,0xff1a0000"
     "earlyprintk"
+    "efifb=off"
 
     "quiet"
     "vt.global_cursor_default=0"
@@ -31,7 +34,8 @@
     };
   };
 
-  mobile.system.type = "u-boot";
+  #mobile.system.type = "u-boot";
+  mobile.system.type = "uefi";
 
   mobile.device.firmware = pkgs.callPackage ./firmware {};
   mobile.boot.stage-1.firmware = [
