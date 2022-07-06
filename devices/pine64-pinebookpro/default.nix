@@ -59,5 +59,5 @@
     storage.internal = "/dev/disk/by-path/platform-fe330000.sdhci";
   };
 
-  mobile.boot.stage-1.tasks = [ ./usb_role_switch_task.rb ];
+  #mobile.boot.stage-1.tasks = [ ./usb_role_switch_task.rb ];
 }
