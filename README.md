@@ -11,21 +11,31 @@ In other words, probably because they're not phones or tablets.
 How to use this repository
 --------------------------
 
-The `default.nix` proxies this repository's devices to the `default.nix` from
-the main Mobile NixOS repository as given.
-
-This file is provided as a convenience.
+The `default.nix` in this repository will evaluate the system appropriately
+against a given Mobile NixOS repository. This file is provided as a convenience.
 
 ```
 .../Projects/extra-devices $ nix-build \
-    -I mobile-nixos=.../Projects/mobile-nixos/ \
-    --argstr device device-name \
-    -A build.default
+    --arg mobile-nixos ../mobile-nixos \
+    --argstr device anbernic-rg351p \
+    -A outputs.default
 ```
 
-This, though, does not trivially allow re-using the Mobile NixOS examples.
+By abusing knowledge of how example systems in Mobile NixOS are built, we can
+use the `configuration` argument to pass the entry point configuration of the
+example system.
 
-Another options is to pass the *path* to the device directory to an invocation
+```
+.../Projects/extra-devices $ nix-build \
+    --arg mobile-nixos ../mobile-nixos \
+	--argstr device anbernic-rg351p \
+	--arg configuration ../mobile-nixos/examples/hello/configuration.nix \
+	-A outputs.default
+```
+
+### Alternative usage
+
+Another option is to pass the *path* to the device directory to an invocation
 of the usual Mobile NixOS.
 
 ```
@@ -39,12 +49,9 @@ trace: **************************************************************
 ...
 ```
 
-The second usage is more likely to be the one you end up using.
+Alternatively, users may want to symlink the device folders into their
+Mobile NixOS checkout.
 
-
-### Alternative usage
-
-Users may want to symlink the device folders into their Mobile NixOS checkout.
 The main benefit is that they now act just like built-in devices, including
 working `bin/kernel-normalize-config`.
 
