@@ -76,3 +76,9 @@ contributions to these devices, or to the experiments, feel free to contribute.
 Note that it is possible that this repository drifts and becomes incompatible
 with Mobile NixOS. If it does, it is a bug, it should be fixed, but there is
 no SLA. It might stay broken forever.
+
+Example reasons why devices here shouldn't be in Mobile NixOS:
+
+ - CHUWI Hi10 Pro HQ64 build may be extremely device-specific (baked-in touchscreen calibration) and anyway barely useable.
+ - Pinebook Pro is not a mobile device, served as an integration target for assumptions about the RK3399 and TDM testing.
+ - Anbernic RG351P is kinda mobile, but not a phone, not a tablet, no touchscreen. This here is more a show of force about integrating really *odd* devices within the build system.
