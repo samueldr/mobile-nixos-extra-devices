@@ -26,4 +26,10 @@ in
   # (See nixos/modules/config/system-path.nix)
   programs.ssh.package = null-package;
   environment.defaultPackages = [];
+
+  # Disable console things
+  console.enable = false;
+
+  # Networking
+  networking.dhcpcd.enable = false;
 }
