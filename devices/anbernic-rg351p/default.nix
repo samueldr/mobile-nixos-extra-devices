@@ -13,8 +13,11 @@
 
   boot.kernelParams = [
     #"quiet"
-    #"vt.global_cursor_default=0"
+    #"console=ttyFIQ0"
+    "net.iframes=0"
     "console=tty0"
+    "fbcon=rotate:3"
+    "consoleblank=0"
   ];
 
   mobile.boot.stage-1 = {
