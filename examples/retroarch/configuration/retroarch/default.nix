@@ -3,7 +3,6 @@
 
 , fetchFromGitHub
 
-, buildType
 , withAssets ? true
 , withCoreInfo ? true
 , withWayland  ? stdenv.isLinux

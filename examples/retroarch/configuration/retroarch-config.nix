@@ -13,23 +13,12 @@ in
 {
   options = {
     wip.retroarch = {
-      buildType = mkOption {
-        default = "default";
-        type = types.enum [ "default" "odroidgo2" ];
-      };
     };
   };
   config = {
-    wip.retroarch = mkMerge [
-      (mkIf (config.mobile.device.name == "anbernic-rg351p") {
-        buildType = "odroidgo2";
-      })
-    ];
     nixpkgs.overlays = [(
       final: super: {
-        retroarch = final.callPackage ./retroarch {
-          inherit (cfg) buildType;
-        };
+        retroarch = final.callPackage ./retroarch { };
         retroarch-assets = super.retroarch-assets.overrideAttrs({ postInstall ? "", ... }: {
           postInstall = ''
             (
