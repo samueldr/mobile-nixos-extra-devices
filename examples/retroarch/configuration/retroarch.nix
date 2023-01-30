@@ -1,23 +1,30 @@
-{ lib, pkgs, ... }:
+# Configuration to pick the ambiant retroarch into the local system
+{ config, lib, pkgs, ... }:
 
+let
+  inherit (lib)
+    optionalString
+  ;
+in
 {
   environment.systemPackages = with pkgs; [
+    cage
     retroarch
   ];
 
   hardware.opengl.enable = true;
 
+  # Let userspace use the power key as a "menu" key.
   services.logind.extraConfig = ''
     HandlePowerKey=ignore
   '';
 
-  # Ensure retroarch owns VT1 entirely
+  # Signal VT1 ownership
   systemd.services."getty@tty1" = {
     enable = false;
   };
 
-  systemd.services.retroarch = {
-    description = "Retroarch";
+  systemd.services.games-session = {
     enable = true;
     after = [
       "systemd-user-sessions.service"
@@ -26,16 +33,19 @@
       "systemd-logind.service"
       "getty@tty1.service"
     ];
+    before = [ "graphical.target" ];
     wants = [ "dbus.socket" "systemd-logind.service" "plymouth-quit.service"];
-    #before = [ "multi-user.target" ];
-    wantedBy = [ "multi-user.target" ];
-    partOf = [ "multi-user.target" ];
+    wantedBy = [ "graphical.target" ];
+    partOf = [ "graphical.target" ];
+    conflicts = [
+      # Ensure there's no login prompt on the screen used for steam.
+      "getty@tty1.service"
+      # Ensures we don't run at the same time as display manager
+      "display-manager.service"
+    ];
+    restartIfChanged = false;
     unitConfig.ConditionPathExists = "/dev/tty1";
     serviceConfig = {
-      SyslogIdentifier = "retroarch";
-      ExecStart = ''
-        ${pkgs.retroarch}/bin/retroarch
-      '';
       User = 1000;
       PAMName = "login";
       WorkingDirectory = "~";
@@ -50,11 +60,14 @@
       UtmpMode = "user";
       Restart = "always";
     };
-    conflicts = [
-      # Ensure there's no login prompt on the screen used for steam.
-      "getty@tty1.service"
-      # Ensures we don't run at the same time as a display manager
-      "display-manager.service"
-    ];
+    script = ''
+      ${pkgs.cage}/bin/cage \
+        -s \
+        ${optionalString (config.mobile.device.name == "anbernic-rg351p") "-r"} \
+        ${pkgs.retroarch}/bin/retroarch
+    '';
   };
+
+  # Ensures graphical target is ran.
+  systemd.defaultUnit = "graphical.target";
 }
