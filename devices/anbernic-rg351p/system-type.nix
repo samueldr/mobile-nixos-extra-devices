@@ -23,12 +23,16 @@ let
 
     setenv dtb_name "rk3326-rg351p-linux.dtb"
 
-    gpio toggle a15
+    gpio toggle a15 # on
     load mmc 1:1 ''${kernel_addr_r}   /mobile-nixos/boot/kernel
+    gpio toggle a15 # off
+
     load mmc 1:1 ''${fdt_addr_r}      /mobile-nixos/boot/dtbs/rockchip/''${dtb_name}
+
+    gpio toggle a15 # on
     load mmc 1:1 ''${ramdisk_addr_r} /mobile-nixos/boot/stage-1
     setenv ramdisk_size ''${filesize}
-    gpio toggle a15
+    gpio toggle a15 # off
 
     booti ''${kernel_addr_r} ''${ramdisk_addr_r}:''${ramdisk_size} ''${fdt_addr_r};
 
