@@ -139,4 +139,8 @@ stdenv.mkDerivation rec {
       "--with-core_info_dir=${libretro-core-info}/share"
     ]
   ;
+
+  meta = {
+    platforms = lib.platforms.unix;
+  };
 }

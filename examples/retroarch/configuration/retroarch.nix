@@ -9,7 +9,7 @@ in
 {
   environment.systemPackages = with pkgs; [
     cage
-    retroarch
+    config.wip.retroarch.wrapped
   ];
 
   hardware.opengl.enable = true;
@@ -64,7 +64,7 @@ in
       ${pkgs.cage}/bin/cage \
         -s \
         ${optionalString (config.mobile.device.name == "anbernic-rg351p") "-r"} \
-        ${pkgs.retroarch}/bin/retroarch
+        ${config.wip.retroarch.wrapped}/bin/retroarch
     '';
   };
 
