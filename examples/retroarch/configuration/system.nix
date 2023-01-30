@@ -1,6 +1,10 @@
 { config, lib, pkgs, ... }:
 
 {
+  nixpkgs.overlays = [
+    (import ../pkgs)
+  ];
+
   users.users.games = {
     uid = 1000;
     isNormalUser = true;
