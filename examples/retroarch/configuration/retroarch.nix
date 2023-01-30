@@ -70,4 +70,29 @@ in
 
   # Ensures graphical target is ran.
   systemd.defaultUnit = "graphical.target";
+
+  nixpkgs.overlays = [(
+    final: super: {
+      retroarch = final.callPackage ./retroarch { };
+      retroarch-assets = super.retroarch-assets.overrideAttrs({ postInstall ? "", ... }: {
+        postInstall = ''
+          (
+          cd $out/share/retroarch/assets
+          PS4=" $ "
+          set -x
+          rm sounds/BGM.wav
+          rm -r wallpapers
+          rm -r Systematic FlatUX Automatic
+          rm -r branding pkg switch
+          rm -r devtools
+          rm -r ctr
+          rm -r scripts
+          rm -r cfg
+          cd xmb
+          rm -r systematic neoactive retroactive automatic retrosystem dot-art daite pixel
+          )
+        '';
+      });
+    }
+  )];
 }
