@@ -1,11 +1,23 @@
-{ lib, ... }:
+{ config, lib, pkgs, ... }:
 
 {
-  users.users.user = {
+  users.users.games = {
+    uid = 1000;
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" ];
+    extraGroups = [
+      "audio"
+      "input"
+      "networkmanager"
+      "systemd-journal"
+      "tty"
+      "video"
+      "wheel"
+    ];
     password = "1234";
   };
+
+  mobile.beautification.silentBoot = true;
+  mobile.beautification.splash = true;
 
   security.sudo = {
     enable = true;
@@ -57,4 +69,14 @@
     }
   ;
 
+  # Ensures wlroots seats shenanigans can get a seat
+  security.polkit.enable = true;
+
+  # Keep only ~256MiB of logs
+  # This is a lot of logs, but this is kept in the stateful directory of the userdata partition.
+  # This may help with figuring out problems down the line.
+  # NOTE: 4GiB is the upstream default for SystemMaxUse.
+  services.journald.extraConfig = ''
+    SystemMaxUse=256M
+  '';
 }
