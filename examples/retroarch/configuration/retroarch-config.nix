@@ -2,12 +2,22 @@
 
 let
   inherit (lib)
+    attrNames
+    concatMapStringsSep
+    filterAttrs
     mkIf
     mkMerge
     mkOption
     types
   ;
   cfg = config.wip.retroarch;
+
+  keptConfig = filterAttrs (k: v: v != null) cfg.config;
+  forcedConfig = pkgs.writeText "retroarch-forced-fragment.cfg" (
+    concatMapStringsSep "\n" (k:
+      "${k} = ${builtins.toJSON keptConfig."${k}"}"
+    ) (attrNames keptConfig)
+  );
 in
 {
   options = {
@@ -18,6 +28,17 @@ in
       };
       cores = mkOption {
         type = with types; listOf package;
+      };
+      config = mkOption {
+        type = with types; nullOr (attrsOf str);
+        default = {};
+        description = ''
+          RetroArch options that will be forced via --appendconfig.
+
+          Use `null` to remove a previously defined value.
+
+          All values are strings, that is true for the configuration format too.
+        '';
       };
     };
   };
@@ -33,21 +54,14 @@ in
       # Standalone
       thepowdertoy
     ];
+    wip.retroarch.config = {
+    };
     wip.retroarch.wrapped = pkgs.callPackage (
       { symlinkJoin
-      , writeText
       , retroarch
       , selectedRetroArchCores
+      , forcedConfig
       }:
-      let
-        forcedConfig = writeText "retroarch-forced-fragment.cfg" ''
-          core_info_cache_enable = "false"
-
-          # Restart is buggy on some platforms...
-          # ... and undesirable UX-wise...
-          menu_show_restart_retroarch = "false"
-        '';
-      in
       symlinkJoin {
         name = "retroarch-wrapped";
         paths = selectedRetroArchCores;
@@ -66,6 +80,7 @@ in
       }
     ) {
       selectedRetroArchCores = cfg.cores;
+      inherit forcedConfig;
     };
   };
 }
