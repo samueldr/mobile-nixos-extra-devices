@@ -19,7 +19,6 @@
 , libGL
 , libGLU
 , libdrm
-, libpulseaudio
 , libxkbcommon
 , libxml2
 , mbedtls_2
@@ -79,7 +78,6 @@ stdenv.mkDerivation rec {
     alsa-lib
     dbus
     libdrm
-    libpulseaudio
     libxkbcommon
     mesa
     udev
