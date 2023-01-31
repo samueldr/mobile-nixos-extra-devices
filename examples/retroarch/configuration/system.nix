@@ -5,6 +5,7 @@
     (import ../pkgs)
   ];
 
+  users.mutableUsers = false;
   users.users.games = {
     uid = 1000;
     isNormalUser = true;
@@ -17,7 +18,8 @@
       "video"
       "wheel"
     ];
-    password = "1234";
+    password = "";
+    home = "/userdata/Data/home";
   };
 
   mobile.beautification.silentBoot = true;
