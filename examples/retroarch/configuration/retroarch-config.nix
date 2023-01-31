@@ -57,15 +57,29 @@ in
   };
   config = {
     wip.retroarch.cores = with pkgs.libretro.override { inherit (pkgs) retroarch; }; [
+      beetle-pce-fast
       fceumm
       gambatte
-      #gpsp
       pcsx-rearmed
       picodrive
       snes9x2005-plus
-
-      # Standalone
-      thepowdertoy
+      (gpsp.overrideAttrs({ makeFlags ? [], patches ? [], ... }: {
+        makeFlags =
+          let
+            inherit (pkgs) stdenv;
+          in
+          makeFlags ++ [
+            "CROSS_COMPILE=${stdenv.cc.targetPrefix}"
+            "CC=${stdenv.cc.targetPrefix}cc"
+            "LD=${stdenv.cc.targetPrefix}cc"
+            "CXX=${stdenv.cc.targetPrefix}c++"
+            "AR=${stdenv.cc.bintools.targetPrefix}ar"
+            # XXX pick from a list mapping the target platform
+            "platform=arm64"
+            "CPU_ARCH=arm64"
+          ]
+        ;
+      }))
     ];
     wip.retroarch.config = {
       config_save_on_exit = "true";
