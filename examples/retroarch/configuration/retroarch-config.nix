@@ -67,6 +67,14 @@ in
         makeFlags =
           let
             inherit (pkgs) stdenv;
+            platforms = {
+              "aarch64-linux" = "arm64";
+              "x86_64-linux" = "unix";
+            };
+            cpuArches = {
+              "aarch64-linux" = "arm64";
+              "x86_64-linux" = "x86_32";
+            };
           in
           makeFlags ++ [
             "CROSS_COMPILE=${stdenv.cc.targetPrefix}"
@@ -74,9 +82,8 @@ in
             "LD=${stdenv.cc.targetPrefix}cc"
             "CXX=${stdenv.cc.targetPrefix}c++"
             "AR=${stdenv.cc.bintools.targetPrefix}ar"
-            # XXX pick from a list mapping the target platform
-            "platform=arm64"
-            "CPU_ARCH=arm64"
+            "platform=${platforms."${pkgs.stdenv.system}"}"
+            "CPU_ARCH=${cpuArches."${pkgs.stdenv.system}"}"
           ]
         ;
       }))
