@@ -2,6 +2,7 @@
 
 let
   inherit (lib)
+    mkIf
     mkOption
     types
   ;
@@ -26,7 +27,7 @@ in
       type = types.bool;
     };
   };
-  config = {
+  config = mkIf config.wip.retroarch.enableDebugTooling {
     environment.systemPackages = with pkgs; [
       alsa-utils
       cage
