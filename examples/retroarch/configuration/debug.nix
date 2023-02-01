@@ -29,6 +29,8 @@ in
   config = {
     environment.systemPackages = with pkgs; [
       alsa-utils
+      cage
+      config.wip.retroarch.wrapped
       evtest
       htop
       input-utils
