@@ -35,6 +35,11 @@ in
       };
     };
 
+    wip.retroarch.quirks.cage = {
+      enable = true;
+      parameters = [ "-r" ];
+    };
+
     wip.retroarch.config = {
       # Keybinds
       input_enable_hotkey_btn = "10";        # Select
