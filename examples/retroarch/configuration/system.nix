@@ -50,7 +50,7 @@
   mobile.generatedFilesystems = {
     rootfs = lib.mkDefault {
       label = lib.mkForce "RETROARCH";
-      id    = lib.mkForce "12345678-1324-1234-0000-D00D00000420";
+      ext4.partitionID = lib.mkForce "12345678-1324-1234-0000-D00D00000420";
     };
   };
 
