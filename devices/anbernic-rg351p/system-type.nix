@@ -5,10 +5,11 @@ let
 
   inherit (config.mobile.outputs) recovery stage-0;
   inherit (pkgs) imageBuilder;
-  inherit (lib) mkIf mkOption types;
+  inherit (lib) mkBefore mkIf mkOption types;
   deviceName = config.mobile.device.name;
   kernel = stage-0.mobile.boot.stage-1.kernel.package;
   kernel_file = "${kernel}/${if kernel ? file then kernel.file else pkgs.stdenv.hostPlatform.linux-kernel.target}";
+  boot-partition = config.mobile.generatedFilesystems.boot.output;
 
   # GPIO a15 is the vibrator motor.
   bootini = pkgs.writeText "${deviceName}-boot.ini" ''
@@ -46,48 +47,6 @@ let
     gpio toggle a15
     sleep 0.5
   '';
-
-  # TODO: use generatedFilesystems
-  boot-partition =
-    imageBuilder.fileSystem.makeFAT32 {
-      name = "MN-BOOT";
-      partitionLabel = "MN-BOOT";
-      partitionID = "ABADF00D";
-      partitionUUID = "CFB21B5C-A580-DE40-940F-B9644B4466E1";
-      # Let's give us a *bunch* of space to play around.
-      size = imageBuilder.size.MiB 128;
-      bootable = true;
-      populateCommands = ''
-        mkdir -vp mobile-nixos/{boot,recovery}
-        (
-        cd mobile-nixos/boot
-        cp -v ${stage-0.mobile.outputs.initrd} stage-1
-        cp -v ${kernel_file} kernel
-        mkdir -p dtbs/rockchip
-        cp -t dtbs/rockchip -v ${kernel}/dtbs/rockchip/rk3326*rg351*dtb
-        )
-        (
-        cd mobile-nixos/recovery
-        cp -v ${recovery.mobile.outputs.initrd} stage-1
-        cp -v ${kernel_file} kernel
-        mkdir -p dtbs/rockchip
-        cp -t dtbs/rockchip -v ${kernel}/dtbs/rockchip/rk3326*rg351*dtb
-        )
-        cp -v ${bootini} ./boot.ini
-      '';
-    }
-  ;
-
-  # XXX explore if GPT is possible
-  disk-image = imageBuilder.diskImage.makeMBR {
-    name = "mobile-nixos";
-    diskID = "01234567";
-
-    partitions = [
-      boot-partition
-      config.mobile.outputs.generatedFilesystems.rootfs
-    ];
-  };
 in
 {
   options.mobile = {
@@ -119,12 +78,49 @@ in
   config = lib.mkMerge [
     { mobile.system.types = [ "odroid-style" ]; }
     (mkIf enabled {
+      mobile.generatedDiskImages.disk-image = {
+        partitions = mkBefore [
+          {
+            name = "mn-boot";
+            partitionLabel = "boot";
+            partitionUUID = "CFB21B5C-A580-DE40-940F-B9644B4466E1";
+            bootable = true;
+            raw = boot-partition;
+          }
+        ];
+      };
+      mobile.generatedFilesystems.boot = {
+        filesystem = "fat32";
+        # Let's give us a *bunch* of space to play around.
+        # And let's not forget we have the kernel and stage-1 twice.
+        size = pkgs.image-builder.helpers.size.MiB 128;
+
+        fat32.partitionID = "ABADF00D";
+        populateCommands = ''
+          mkdir -vp mobile-nixos/{boot,recovery}
+          (
+          cd mobile-nixos/boot
+          cp -v ${stage-0.mobile.outputs.initrd} stage-1
+          cp -v ${kernel_file} kernel
+          mkdir -p dtbs/rockchip
+          cp -t dtbs/rockchip -v ${kernel}/dtbs/rockchip/rk3326*rg351*dtb
+          )
+          (
+          cd mobile-nixos/recovery
+          cp -v ${recovery.mobile.outputs.initrd} stage-1
+          cp -v ${kernel_file} kernel
+          mkdir -p dtbs/rockchip
+          cp -t dtbs/rockchip -v ${kernel}/dtbs/rockchip/rk3326*rg351*dtb
+          )
+          cp -v ${bootini} ./boot.ini
+        '';
+      };
       mobile.outputs = {
         default = config.mobile.outputs.odroid-style.disk-image;
         odroid-style = {
           inherit bootini;
           inherit boot-partition;
-          disk-image = disk-image;
+          disk-image = config.mobile.generatedDiskImages.disk-image.output;
         };
       };
     })
