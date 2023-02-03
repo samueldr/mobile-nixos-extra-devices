@@ -54,27 +54,6 @@
     };
   };
 
-  fileSystems =
-    let
-      tmpfsConf = {
-        device = "tmpfs";
-        fsType = "tmpfs";
-        neededForBoot = true;
-      };
-    in
-    {
-      "/" = lib.mkDefault {
-        #autoResize = lib.mkForce false;
-      };
-      # Nothing is saved, except for the nix store being rehydrated.
-      # XXX target more useful endpoints?
-      # XXX see if we can have squashfs + FAT32 instead with this stage-1
-      "/tmp" = tmpfsConf;
-      "/var/log" = tmpfsConf;
-      "/home" = tmpfsConf;
-    }
-  ;
-
   # This is always true, whether userdata is on FAT32 or ext4.
   systemd.tmpfiles.rules = [
     "d /userdata 0770 games users"
