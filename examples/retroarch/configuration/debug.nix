@@ -61,5 +61,7 @@ in
     wip.retroarch.config = {
       menu_show_quit_retroarch = lib.mkForce "true";
     };
+
+    services.getty.autologinUser = "games";
   };
 }
