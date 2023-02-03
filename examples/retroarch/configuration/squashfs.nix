@@ -42,7 +42,10 @@ in
         "/" = mkDefault {
           autoResize = mkForce false;
           fsType = mkForce config.mobile.generatedFilesystems.rootfs.filesystem;
-          device = mkForce "/dev/sda2";
+          device = mkForce "/dev/rootfs";
+          options = [
+            "loop"
+          ];
         };
 
         "/userdata" = {
@@ -50,6 +53,20 @@ in
           fsType = "vfat";
           # Or else activation script will fail with tmpfiles.d attempting to seed it. :/
           neededForBoot = true;
+          options = [
+            # A bit wild, but this is FAT32 we're talking about
+            "umask=0000"
+            "fmask=0000"
+            "dmask=0000"
+            # Unneeded really since we gave everyone write access
+            "uid=1000"
+            "gid=100"
+
+            # No.
+            "nosuid"
+            "nodev"
+            "noatime"
+          ];
         };
 
         "/etc" = tmpfsConf;
@@ -66,6 +83,7 @@ in
     mobile.boot.stage-1 = {
       kernel.additionalModules = [
         "squashfs"
+        "loop"
       ];
     };
     mobile.generatedFilesystems.rootfs = mkDefault {
@@ -96,6 +114,46 @@ in
     };
     mobile.generatedFilesystems.boot = {
       label = mkForce "USERDATA";
+      size = mkForce (size.GiB 1);
+      populateCommands = mkAfter ''
+        mkdir -p System
+        cp ${config.mobile.generatedFilesystems.rootfs.imagePath} System/rootfs.img
+      '';
     };
+    mobile.generatedDiskImages.disk-image = {
+      partitions = mkForce [
+        {
+          name = "userdata";
+          partitionLabel = "userdata";
+          partitionUUID = "CFB21B5C-A580-DE40-940F-B9644B4466E1";
+          bootable = true;
+          raw = boot-partition;
+        }
+      ];
+    };
+
+    mobile.boot.stage-1.tasks = [
+      (pkgs.writeText "dev-rootfs.rb" ''
+        class Tasks::DevRootFS < SingletonTask
+          DEVICE = ${builtins.toJSON config.fileSystems."/".device}
+          SOURCE = ${builtins.toJSON config.fileSystems."/userdata".device}
+          TARGET = "/userdata"
+          def initialize()
+            add_dependency(:Mount, "/dev")
+            add_dependency(:Files, SOURCE)
+          end
+
+          def run()
+            FileUtils.mkdir_p(TARGET)
+            System.mount(
+              SOURCE, TARGET,
+              type: ${builtins.toJSON config.fileSystems."/userdata".fsType},
+              options: ${builtins.toJSON config.fileSystems."/userdata".options},
+            )
+            File.symlink(File.join(TARGET, "System/rootfs.img"), DEVICE)
+          end
+        end
+      '')
+    ];
   };
 }
