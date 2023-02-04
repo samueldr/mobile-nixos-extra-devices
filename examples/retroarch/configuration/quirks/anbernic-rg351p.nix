@@ -62,6 +62,10 @@ in
       audio_enable = "true";
       video_threaded = "true";
       video_vsync = "true";
+
+      # Audio is a bit quiet, and is hardware controlled with a wheel.
+      # Force it a bit higher in software.
+      audio_volume = "12.000000";
     };
 
     powerManagement.cpuFreqGovernor = "performance";
