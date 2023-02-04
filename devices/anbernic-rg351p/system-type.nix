@@ -5,7 +5,13 @@ let
 
   inherit (config.mobile.outputs) recovery stage-0;
   inherit (pkgs) imageBuilder;
-  inherit (lib) mkBefore mkIf mkOption types;
+  inherit (lib)
+    mkBefore
+    mkDefault
+    mkIf
+    mkOption
+    types
+  ;
   deviceName = config.mobile.device.name;
   kernel = stage-0.mobile.boot.stage-1.kernel.package;
   kernel_file = "${kernel}/${if kernel ? file then kernel.file else pkgs.stdenv.hostPlatform.linux-kernel.target}";
@@ -22,19 +28,17 @@ let
 
     setenv bootargs ${lib.concatStringsSep " " config.boot.kernelParams}
 
-    setenv dtb_name "rk3326-rg351p-linux.dtb"
-
     gpio toggle a15 # on
-    sleep 0.3
+    sleep 0.15
     gpio toggle a15 # off
-    sleep 0.3
+    sleep 0.1
     gpio toggle a15 # on
     sleep 0.3
     gpio toggle a15 # off
 
-    load mmc 1:1 ''${kernel_addr_r}   /mobile-nixos/boot/kernel
-    load mmc 1:1 ''${fdt_addr_r}      /mobile-nixos/boot/dtbs/rockchip/''${dtb_name}
-    load mmc 1:1 ''${ramdisk_addr_r} /mobile-nixos/boot/stage-1
+    load mmc 1:1 ''${kernel_addr_r}   /System/Boot/kernel
+    load mmc 1:1 ''${fdt_addr_r}      /System/Boot/dtbs/rockchip/''${dtb_name}
+    load mmc 1:1 ''${ramdisk_addr_r}  /System/Boot/stage-1
     setenv ramdisk_size ''${filesize}
 
     booti ''${kernel_addr_r} ''${ramdisk_addr_r}:''${ramdisk_size} ''${fdt_addr_r};
@@ -93,23 +97,17 @@ in
       };
       mobile.generatedFilesystems.boot = {
         filesystem = "fat32";
+        label = mkDefault "BOOT";
         # Let's give us a *bunch* of space to play around.
         # And let's not forget we have the kernel and stage-1 twice.
         size = pkgs.image-builder.helpers.size.MiB 128;
 
         fat32.partitionID = "ABADF00D";
         populateCommands = ''
-          mkdir -vp mobile-nixos/{boot,recovery}
+          mkdir -vp System/Boot
           (
-          cd mobile-nixos/boot
+          cd System/Boot
           cp -v ${stage-0.mobile.outputs.initrd} stage-1
-          cp -v ${kernel_file} kernel
-          mkdir -p dtbs/rockchip
-          cp -t dtbs/rockchip -v ${kernel}/dtbs/rockchip/rk3326*rg351*dtb
-          )
-          (
-          cd mobile-nixos/recovery
-          cp -v ${recovery.mobile.outputs.initrd} stage-1
           cp -v ${kernel_file} kernel
           mkdir -p dtbs/rockchip
           cp -t dtbs/rockchip -v ${kernel}/dtbs/rockchip/rk3326*rg351*dtb
