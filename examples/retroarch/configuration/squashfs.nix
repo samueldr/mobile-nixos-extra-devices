@@ -47,6 +47,12 @@ in
           fsType = "tmpfs";
           neededForBoot = true;
         };
+        bind = { from, to }: {
+          "${to}" = {
+            device = from;
+            options = [ "bind" ];
+          };
+        };
       in
       {
         "/" = mkDefault {
@@ -83,12 +89,12 @@ in
         "/run" = tmpfsConf;
         "/tmp" = tmpfsConf;
         "/nix/var" = tmpfsConf;
-
         "/var" = tmpfsConf;
 
         "/root" = tmpfsConf;
         "/home" = tmpfsConf;
       }
+      // bind { from = "/userdata/Data/stateful/log"; to = "/var/log"; }
     ;
     mobile.boot.stage-1 = {
       kernel.additionalModules = [
@@ -143,6 +149,20 @@ in
     };
 
     mobile.boot.stage-1.tasks = [
+      # Workaround for /var/log bind mount depending on a directory that
+      # may not exist.
+      # /var/log is forced to be marked as needed for boot in NixOS.
+      (pkgs.writeText "var-log.rb" ''
+        class Tasks::VarLogBoundDir < SingletonTask
+          TARGET = ${builtins.toJSON config.fileSystems."/var/log".device}
+          def initialize()
+            add_dependency(:Mount, "/mnt/userdata")
+          end
+          def run()
+            FileUtils.mkdir_p(TARGET)
+          end
+        end
+      '')
       (pkgs.writeText "dev-rootfs.rb" ''
         class Tasks::DevRootFS < SingletonTask
           DEVICE = ${builtins.toJSON config.fileSystems."/".device}
