@@ -32,4 +32,7 @@ in
 
   # Networking
   networking.dhcpcd.enable = false;
+
+  systemd.timers."systemd-tmpfiles-clean".enable = false;
+  systemd.timers."logrotate".enable = false;
 }
