@@ -94,7 +94,8 @@ in
       joypad_autoconfig_dir = "${joypadAutoconfig}";
       screenshot_directory = "/userdata/Screenshots";
       savefile_directory   = "/userdata/Saves";
-      savestate_directory  = "/userdata/Saves/states";
+      savestate_directory  = "/userdata/Saves/state";
+      rgui_browser_directory = "/userdata/Roms";
 
       log_dir                    = "${retroarch_stateful}/logs";
       content_favorites_path     = "${retroarch_stateful}/content_favorites.lpl";
@@ -249,5 +250,11 @@ in
       selectedRetroArchCores = cfg.cores;
       inherit forcedConfig;
     };
+    systemd.tmpfiles.rules = [
+      "d /userdata/Data/misc/retroarch 0770 games users"
+      "d /userdata/Roms 0770 games users"
+      "d /userdata/Saves 0770 games users"
+      "d /userdata/Saves/state 0770 games users"
+    ];
   };
 }

@@ -59,7 +59,6 @@
     "d /userdata 0770 games users"
     "d /userdata/Data 0770 games users"
     "d /userdata/Data/home 0770 games users"
-    "d /userdata/Data/misc/retroarch 0770 games users"
   ];
 
   # Ensures wlroots seats shenanigans can get a seat
