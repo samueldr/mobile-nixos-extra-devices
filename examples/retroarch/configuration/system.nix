@@ -22,8 +22,9 @@
     home = "/userdata/Data/home";
   };
 
-  mobile.beautification.silentBoot = true;
-  mobile.beautification.splash = true;
+  # While desirable in theory... in practice the splash doesn't work well.
+  # mobile.beautification.silentBoot = true;
+  # mobile.beautification.splash = true;
 
   security.sudo = {
     enable = true;
