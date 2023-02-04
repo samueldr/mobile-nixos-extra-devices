@@ -13,6 +13,8 @@ let
     types
   ;
   inherit (pkgs.image-builder.helpers) size;
+  deviceName = config.mobile.device.name;
+  name = "${config.mobile.configurationName}-${deviceName}";
   boot-partition = config.mobile.generatedFilesystems.boot.output;
 in
 {
@@ -25,6 +27,14 @@ in
           Use squashfs rootfs.
 
           This is a hack.
+        '';
+      };
+    };
+    wip.retroarch.outputs = {
+      systemFiles = mkOption {
+        type = types.package;
+        description = ''
+          Contents that would be at the root of the target filesystem.
         '';
       };
     };
@@ -155,5 +165,12 @@ in
         end
       '')
     ];
+
+    wip.retroarch.outputs.systemFiles = pkgs.runCommand "${name}-system-files" {} ''
+      mkdir -p $out
+      (cd $out
+      ${config.mobile.generatedFilesystems.boot.populateCommands}
+      )
+    '';
   };
 }
