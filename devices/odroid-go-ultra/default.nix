@@ -12,13 +12,12 @@
   };
 
   boot.kernelParams = [
-    #"quiet"
-    #"console=ttyFIQ0"
-    #"net.iframes=0"
-    #"console=tty0"
-    #"fbcon=rotate:3"
-    #"consoleblank=0"
+    "no_console_suspend"
+    "consoleblank=0"
+    "fbcon=rotate:3"
   ];
+
+  mobile.boot.serialConsole = "ttyAML0,115200n8";
 
   mobile.boot.stage-1 = {
     kernel.package = pkgs.callPackage ./kernel { };
@@ -32,7 +31,7 @@
     };
   };
 
-  mobile.system.type = "odroid-style";
+  mobile.system.type = "odroid-go-ultra-style";
 
   mobile.usb.idVendor = "1209";
   mobile.usb.idProduct = "0069";

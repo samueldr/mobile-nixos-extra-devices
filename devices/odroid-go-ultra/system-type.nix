@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  enabled = config.mobile.system.type == "odroid-style";
+  enabled = config.mobile.system.type == "odroid-go-ultra-style";
 
   inherit (config.mobile.outputs) recovery stage-0;
   inherit (pkgs) imageBuilder;
@@ -17,47 +17,49 @@ let
   kernel_file = "${kernel}/${if kernel ? file then kernel.file else pkgs.stdenv.hostPlatform.linux-kernel.target}";
   boot-partition = config.mobile.generatedFilesystems.boot.output;
 
-  # GPIO a15 is the vibrator motor.
   bootini = pkgs.writeText "${deviceName}-boot.ini" ''
-    ODROIDGO2-UBOOT-CONFIG
-
-    setenv dtb_name       "rk3326-rg351p-linux.dtb"
-    setenv ramdisk_addr_r "0x01100000"
-    setenv fdt_addr_r     "0x01f00000"
-    setenv kernel_addr_r  "0x02008000"
+    ODROIDGOU-UBOOT-CONFIG
 
     setenv bootargs ${lib.concatStringsSep " " config.boot.kernelParams}
 
-    gpio toggle a15 # on
-    sleep 0.15
-    gpio toggle a15 # off
-    sleep 0.1
-    gpio toggle a15 # on
-    sleep 0.3
-    gpio toggle a15 # off
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
 
-    load mmc 1:1 ''${kernel_addr_r}   /System/Boot/kernel
-    load mmc 1:1 ''${fdt_addr_r}      /System/Boot/dtbs/rockchip/''${dtb_name}
-    load mmc 1:1 ''${ramdisk_addr_r}  /System/Boot/stage-1
+    setenv fdt_addr_r     "0x10000000"
+    setenv ramdisk_addr_r "0x11000000"
+    setenv kernel_addr_r  "0x1b00000"
+
+    load mmc ''${devno}:1 ''${kernel_addr_r}   /System/Boot/kernel
+    load mmc ''${devno}:1 ''${fdt_addr_r}      /System/Boot/dtbs/amlogic/''${fdtfile}
+    load mmc ''${devno}:1 ''${ramdisk_addr_r}  /System/Boot/stage-1
     setenv ramdisk_size ''${filesize}
 
-    booti ''${kernel_addr_r} ''${ramdisk_addr_r}:''${ramdisk_size} ''${fdt_addr_r};
+    fdt addr ''${fdt_addr_r}
 
-    sleep 0.9
-    gpio toggle a15
-    sleep 0.9
-    gpio toggle a15
-    sleep 0.9
-    gpio toggle a15
-    sleep 0.9
-    gpio toggle a15
-    sleep 0.9
+    # Eh...
+    fdt resize 1024
+    fdt mknode / mobile-nixos
+    fdt set    /mobile-nixos device-name ${deviceName}
+
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo booti ''${kernel_addr_r} ''${ramdisk_addr_r}:''${ramdisk_size} ''${fdt_addr_r}
+    booti ''${kernel_addr_r} ''${ramdisk_addr_r}:''${ramdisk_size} ''${fdt_addr_r}
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo ""
+    echo "booti failure..."
+    echo ""
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
   '';
 in
 {
   options.mobile = {
     outputs = {
-      odroid-style = {
+      odroid-go-ultra-style = {
         bootini = mkOption {
           type = types.package;
           internal = true;
@@ -82,18 +84,17 @@ in
   };
 
   config = lib.mkMerge [
-    { mobile.system.types = [ "odroid-style" ]; }
+    { mobile.system.types = [ "odroid-go-ultra-style" ]; }
     (mkIf enabled {
       mobile.generatedDiskImages.disk-image = {
         partitioningScheme = "mbr"; # [sic]
         partitions = mkBefore [
           {
             name = "u-boot";
-            # XXX use the prebuilt U-Boot
-            bootable = true;
+            # XXX build U-Boot ourselve...
             raw = ./u-boot.bin;
             offset = 512;
-            length = pkgs.image-builder.helpers.size.MiB 4;
+            #length = pkgs.image-builder.helpers.size.MiB 4;
           }
           {
             name = "mn-boot";
@@ -127,8 +128,8 @@ in
         '';
       };
       mobile.outputs = {
-        default = config.mobile.outputs.odroid-style.disk-image;
-        odroid-style = {
+        default = config.mobile.outputs.odroid-go-ultra-style.disk-image;
+        odroid-go-ultra-style = {
           inherit bootini;
           inherit boot-partition;
           disk-image = config.mobile.generatedDiskImages.disk-image.output;
@@ -137,3 +138,19 @@ in
     })
   ];
 }
+/*
+
+setenv fdt_addr_r     "0x10000000"
+setenv ramdisk_addr_r "0x11000000"
+setenv kernel_addr_r  "0x1b00000"
+
+load mmc 1:1 ${kernel_addr_r}   /System/Boot/kernel
+load mmc 1:1 ${fdt_addr_r}      /System/Boot/dtbs/amlogic/meson-g12b-odroid-go-ultra.dtb
+load mmc 1:1 ${ramdisk_addr_r}  /System/Boot/stage-1
+setenv ramdisk_size ${filesize}
+fdt addr ${fdt_addr_r}
+booti ${kernel_addr_r} - ${fdt_addr_r}
+booti ${kernel_addr_r} ${ramdisk_addr_r}:${ramdisk_size} ${fdt_addr_r}
+
+
+*/
